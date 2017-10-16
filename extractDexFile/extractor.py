@@ -5,8 +5,13 @@ date:2017-10-12
 
 提供外部调用接口
 
+com.xx.xxx.A
+
+A.fix(clasname)
+
 '''
 import os,sys
+import  shutil
 from utils import fileutils,constrant
 from utils import builder
 from utils import mainfest
@@ -19,29 +24,48 @@ class ExtractorDex():
     def __init__(self,srcApk=None):
         self.Apk=srcApk#默认支持传递apk路径 ，如果没有会从指定路径读取
     	self.filelist =fileutils.scanFile(constrant.APK_PATH,suffix=constrant.APK_SUFFIX)
-        self.modifyApk =None
-
+        self.copyBaseApk =None
+        self.disaCodePath=None
     def copyApk(self):
         log.log_print("copy Apk")
         if self.Apk:
-            self.modifyApk= fileutils.copyFile(self.Apk)
+            self.copyBaseApk= fileutils.copyFile(self.Apk,constrant.TMP_DIR+os.sep+constrant.TMP_COPY_APK)
         else:
-            self.modifyApk= fileutils.copyFile(self.filelist[0])
+            self.copyBaseApk= fileutils.copyFile(self.filelist[0],constrant.TMP_DIR+os.sep+constrant.TMP_COPY_APK)
     def decodeApk(self):
         log.log_print("disassemble Apk")
-        builder.decodeApk(self.modifyApk,constrant.SMALI_OUT_PATH)
+        builder.decodeApk(self.copyBaseApk, constrant.SMALI_OUT_PATH)
     def makePatchDex(self):
         log.log_print("makePatchDex .. ")
         packageName=mainfest.getApkPackageName()
-        mlist = fileutils.scanFile(constrant.SMALI_OUT_PATH+os.sep+packageName.replace('.',os.sep), suffix=constrant.SMALI_SUFFIX)
+        log.log_print("packageName:%s"%packageName)
+        self.disaCodePath=constrant.SMALI_OUT_PATH+os.sep+'smali'+os.sep+packageName.replace('.',os.sep)
+        mlist = fileutils.scanFile(self.disaCodePath, suffix=constrant.SMALI_SUFFIX)
         log.log_print("modifySmaliFileMetho begin")
+        print "mlist",mlist
         for item in mlist:
             modifyer.modifySmaliFileMethod(item)
         log.log_print("modifySmaliFileMetho end")
+        self.buildApk()
     def buildApk(self):
-        pass
+        log.log_print("build apk")
+        builder.rebuildApk(constrant.SMALI_OUT_PATH)
+    def doPatch(self):
+        builder.makePatchDexData(self.copyBaseApk, constrant.TMP_APK_PATH + os.sep + constrant.BASE_METHOD_MODIFY_APK)
+        log.log_print('dopatch ok ')
     def release(self):
-        pass
+        try:
+            fileutils.copyDirs(constrant.SRC_ANDFIX_PATH, constrant.DST_ANDFIX_PATH)
+            mlist = fileutils.scanFile(constrant.PATCH_APK_DEX, suffix=constrant.PATCH_DEX_SUFFIX)
+            if not os.path.isdir(constrant.APP_ASSETS_DIR):
+                os.makedirs(constrant.APP_ASSETS_DIR)
+            out_patch_file = constrant.APP_ASSETS_DIR + os.sep + 'out.apatch'
+            shutil.copyfile(mlist[0], out_patch_file)
+            for file in fileutils.scanFile(self.disaCodePath, suffix=constrant.SMALI_SUFFIX):
+                pass
+        except Exception as e:
+            log.log_print("when build release apk was occured an error ",log.ERROR)
+            log.log_print(e,log.ERROR)
 
 
 '''
@@ -51,10 +75,15 @@ class ExtractorDex():
 '''
 def startWork(apk=None):
     #test apk
-    extractor = ExtractorDex(srcApk=apk)
-    extractor.copyApk()
-    extractor.decodeApk()
-    extractor.makePatchDex()
+    src = sys.path[0]+os.sep+'tools'+os.sep+'code'+os.sep+'com'+os.sep+'alipay'
+    dst =constrant.SMALI_OUT_PATH+os.sep+'smali'+os.sep+'com'+os.sep+'alipay'
+    fileutils.copyDirs(src,dst)
+
+    # extractor = ExtractorDex(srcApk=apk)
+    # extractor.copyApk()
+    # extractor.decodeApk()
+    # extractor.makePatchDex()
+    # extractor.doPatch()
     #test smali
     # mlist = fileutils.scanFile(constrant.APK_PATH,suffix=constrant.SMALI_SUFFIX)
     # for item in mlist:

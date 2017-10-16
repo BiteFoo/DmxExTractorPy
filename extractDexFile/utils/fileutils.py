@@ -7,21 +7,35 @@ date:
 import sys,os
 import shutil
 from log import log
+from utils import constrant
 
 '''
 logging 打印级别
 (DEBUG, INFO, WARNING, ERROR, CRITICAL).
 '''
-def copyFile(apk):
-	if not os.path.isfile(apk):
-		log.log_print("%s is not file"%apk,log.ERROR)
+def copyFile(srcfile,dstfile):
+	if not os.path.isfile(srcfile):
+		log.log_print("%s is not file" % srcfile, log.ERROR)
 		return
-	tmp = os.path.split(apk)
-	modifyApk = tmp[0]+os.sep+"modify_"+tmp[1]
-	deleteFile(modifyApk)
-	shutil.copyfile(apk,modifyApk)
-	log.log_print("copy %s is ok" % modifyApk,log.DEBUG)
-	return modifyApk
+	createDirs(constrant.TMP_DIR) #预先创建
+	copyFile = dstfile
+	deleteFile(copyFile)
+	shutil.copyfile(srcfile, copyFile)
+	log.log_print("copy %s is ok" % copyFile,log.DEBUG)
+	return copyFile
+
+def copyDirs(src,dst):
+	log.log_print(os.path.isdir(src))
+	log.log_print(os.path.isdir(dst))
+	if not checkDirs(src) :
+		log.log_print("copy dirs error,%s  not directory"%(src),log.ERROR)
+		sys.exit(1)
+	try:
+		shutil.copytree(src=src,dst=dst,symlinks=True) #注意，dst目录要不在，如果已经存在，则需要删除才能复制
+	except Exception as e:
+		log.log_print("copy dirs occurred exception",log.ERROR)
+		log.log_print(e,log.ERROR)
+		sys.exit(1)
 
 '''
 根据文件名，返回文件路径
@@ -57,7 +71,6 @@ def renameFile(src,dst):
 def scanFile(rootPath,preffix =None,suffix=None,isScanFile=False):
 	filelist=[]
 	for root,dirs,files in os.walk(rootPath):
-		# log.log_print(files,log.DEBUG)
 		for file in files:
 			name = os.path.basename(file)
 			if suffix:

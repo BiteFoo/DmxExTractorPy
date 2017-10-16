@@ -1,0 +1,8 @@
+# direct methods
+.method static constructor <clinit>()V
+    .locals 1
+    .prologue
+    const-class v0, Lcom/euler/test/O;
+    invoke-static {v0}, Lcom/alipay/euler/andfix/AndFixManager;->fixfunc(Ljava/lang/Class;)V
+    return-void
+.end method
