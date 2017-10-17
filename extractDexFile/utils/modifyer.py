@@ -124,49 +124,66 @@ def add_fix_function_code(file):
 		lines = fd.readlines()
 		out_fd =open(file,"w+")
 		tmpDict = found(static_method_reg_str,lines)
-		if tmpDict == None:
+		if tmpDict.get('isinterface') == True :
+			# 接口类
 			out_fd.writelines(lines)
 			return
-		if  tmpDict.get('method_index')== 0:
+		tmpIndex=tmpDict.get('method_index')
+		clazz =tmpDict.get('clazz')
+		objlines = ' const-class v0, ' + clazz + '\n'
+		invoke=' invoke-static {v0}, Lcom/alipay/euler/andfix/AndFixManager;->fixfunc(Ljava/lang/Class;)V\n'
+		if  tmpIndex== 0:
+			log.log_print('tmpindex== 0')
 			# 说明，没有找到<clinit>方法
 			mDict=found(constrant.METHOD_START,lines)
-			#需要插入完整的方法体
-
-
-
-
-		elif tmpDict.get('method_index') >0:
+			#需要添加完整的方法体
+			tmpIndex = mDict.get('method_index')
+			tmpfd = open(constrant.ADD_FIX_FUNCTION_CODE_PATH,'r')
+			tmplines =tmpfd.readlines()
+			tmplines.insert(3,objlines)
+			log.log_print(tmplines)
+			tmpfd.close()
+			for item in tmplines:
+				lines.insert(tmpIndex,item)
+				tmpIndex+=1
+			lines.insert(tmpIndex,'\n') #多添加一个换行符
+			out_fd.writelines(lines)
+		elif tmpIndex>0:
 			# 说明，找到了<clinit>方法
-		    #只需要插入部分代码
-
-
+		    #只需要添加部分代码
+			log.log_print('tmpIndex > 0')
+			tmpIndex += 5
+			lines.insert(tmpIndex,objlines)
+			tmpIndex +=1
+			lines.insert(tmpIndex,invoke)
+			out_fd.writelines(lines)
+		out_fd.close()
+		fd.close()
 	except IOError as e:
 		log.log_print('when add fix function code was occured an error',log.ERROR)
 		log.log_print(e,log.ERROR)
-
-
 '''
 返回空对象,表示为interface类
 反之，不为interface类
 '''
 def found(reg_patter,lines):
 	tmpDict ={}
+	position=0
+	tmpDict['method_index'] = position
 	for line in lines:
 		if is_match_reg(interface_class_reg_str, line):
 			# 判断是否是interface类，如果是，那么就不要修改
+			tmpDict['isinterface']=True
 			break
 		elif re.match('^\.class.*;$', line.strip()):
-			clazz = line.split(' ')[2]
+			tmpClazzs = line.split(' ')
+			clazz = tmpClazzs[tmpClazzs.__len__()-1]
 			tmpDict['clazz'] =clazz
-
 		if is_match_reg(reg_patter, line):
 			position = lines.index(line)
 			tmpDict['method_index']=position
-			log.log_print('found <clinit> position :%d' % (position))
 			break
 	return tmpDict
-
-
 
 '''
 过滤R文件和BuilConfig文件

@@ -4,6 +4,14 @@
 
 
 # direct methods
+.method static constructor <clinit>()V
+    .locals 1
+    .prologue
+ const-class v0, Litsec/parserelf/BaseTest;
+
+    invoke-static {v0}, Lcom/alipay/euler/andfix/AndFixManager;->fixfunc(Ljava/lang/Class;)V
+    return-void
+.end method
 .method public constructor <init>()V
     .locals 0
 

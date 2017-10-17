@@ -17,7 +17,7 @@ def copyFile(srcfile,dstfile):
 	if not os.path.isfile(srcfile):
 		log.log_print("%s is not file" % srcfile, log.ERROR)
 		return
-	createDirs(constrant.TMP_DIR) #预先创建
+	createDirs(constrant.TMP_ROOT_DIR) #预先创建
 	copyFile = dstfile
 	deleteFile(copyFile)
 	shutil.copyfile(srcfile, copyFile)
@@ -52,7 +52,7 @@ def createDirs(path):
 	if not checkDirs(path):
 		os.makedirs(path)
 
-def deletDid(path):
+def deletDirs(path):
 	if checkDirs(path):
 		shutil.rmtree(path)
 def deleteFile(apk):

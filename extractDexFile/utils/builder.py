@@ -21,9 +21,9 @@ def decodeApk(apk,smaliPath):
 		log.log_print("when disassemble apk was occured error",log.ERROR)
 		log.log_print(e,log.ERROR)
 
-def rebuildApk(smalipath):
+def rebuildApk(smalipath,outpath):
 	try:
-		cmd ="java -jar %s b %s -o %s"%(apktool_jar,smalipath,constrant.TMP_APK_PATH+os.sep+constrant.BASE_METHOD_MODIFY_APK)
+		cmd ="java -jar %s b %s -o %s"%(apktool_jar,smalipath,outpath)
 		os.system(cmd)
 	except Exception as e:
 		log.log_print("when rebuild apk was occured error",log.ERROR)

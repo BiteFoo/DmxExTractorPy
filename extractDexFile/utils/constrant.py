@@ -12,7 +12,7 @@ description:
 import sys,os
 
 #所有临时文件目录
-TMP_DIR=sys.path[0]+os.sep+"tmp"
+TMP_ROOT_DIR= sys.path[0] + os.sep + "tmp"
 
 APK_PATH=sys.path[0]+os.sep+"sample" #apk存放路径
 
@@ -26,20 +26,22 @@ BASE_RELEASE_APK='base_release.apk' #最后输出的文件，
 
 SMALI_SUFFIX ='.smali' #smali文件后缀
 
-SMALI_OUT_PATH=TMP_DIR+os.sep+"outsmali" #解包后smali路径
+SMALI_OUT_PATH= TMP_ROOT_DIR + os.sep + "outsmali" #解包后smali路径
 #
 TMP_COPY_APK= "tmp_base_copy.apk"  #复制apk的名称
 
-TMP_APK_PATH=TMP_DIR+os.sep+"tmpapk" #临时apk存放路径 ,用这个路径下的apk做差分包
+TMP_APK_PATH= TMP_ROOT_DIR + os.sep + "tmpapk" #临时apk存放路径 ,用这个路径下的apk做差分包
 
-RELEASE_PATH =TMP_DIR+os.sep+"release" #最后输出路径
+RELEASE_APK_NAME = TMP_ROOT_DIR + os.sep + "release_" #最后输出路径
 
-PATCH_APK_DEX=TMP_DIR+os.sep+"patch"  #差分包使用
+PATCH_APK_DEX= TMP_ROOT_DIR + os.sep + "patch"  #差分包使用
 
 PATCH_DEX_SUFFIX='.apatch'  #差分包文件后缀
 
 LOG_FILE ="record.log" #日志文件名称
-APP_ASSETS_DIR=SMALI_OUT_PATH+os.sep+'smali'+os.sep+'assets'
+APP_ASSETS_DIR=SMALI_OUT_PATH+os.sep+'assets'
+
+ADD_FIX_FUNCTION_CODE_PATH=sys.path[0]+os.sep+'tools'+os.sep+'code'+os.sep+'fixcode'
 
 
 #签名文件
@@ -59,4 +61,5 @@ METHOD_START=r'^\.method.*' #方法体的开始
 METHOD_END =r'^\.end method$' #方法体结束
 
 ##########################test############################
-TEST_SMALI_FILE=APK_PATH+os.sep+"MainActivity.smali"  #测试文件 用于测试smali文件中的方法体被删除
+#BaseTest MainActivity
+TEST_SMALI_FILE=APK_PATH+os.sep+"BaseTest.smali"  #测试文件 用于测试smali文件中的方法体被删除
