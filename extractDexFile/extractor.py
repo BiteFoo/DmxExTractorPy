@@ -22,7 +22,6 @@ from log import  log
 
 #dex文件代码抽取工作对象
 class ExtractorDex():
-
     def __init__(self,srcApk=None):
         fileutils.deletDirs(constrant.TMP_ROOT_DIR) #开始清除所有缓存
         self.Apk=srcApk#默认支持传递apk路径 ，如果没有会从指定路径读取
@@ -77,36 +76,17 @@ class ExtractorDex():
         hash =hashlib.md5()
         hash.update(timestamp)
         return hash.hexdigest()
-
-
 '''
 提供两种方式：
 1、提供app
 2、没有app的情况。那么回去指定路径下读取
 '''
 def startWork(apk=None):
-
-    #**************test add fix function
-    # modifyer.add_fix_function_code(constrant.TEST_SMALI_FILE)
-
-    #test apk
-    # src = sys.path[0]+os.sep+'tools'+os.sep+'code'+os.sep+'com'+os.sep+'alipay'
-    # dst =constrant.SMALI_OUT_PATH+os.sep+'smali'+os.sep+'com'+os.sep+'alipay'
-    # fileutils.copyDirs(src,dst)
-
     extractor = ExtractorDex(srcApk=apk)
     extractor.copyApk()
     extractor.decodeApk()
     extractor.makePatchDex()
     extractor.doPatch()
     extractor.release()
-    #test smali
-    # mlist = fileutils.scanFile(constrant.APK_PATH,suffix=constrant.SMALI_SUFFIX)
-    # for item in mlist:
-    #     modifyer.modifySmaliFileMethod(item)
-
-    #
- #D:\Android\worRecord\Androidprotected\extractDexFile\utils\sample
-#D:\Android\worRecord\Androidprotected\extractDexFile\sample
 if __name__=='__main__':
     startWork()

@@ -43,7 +43,6 @@ APP_ASSETS_DIR=SMALI_OUT_PATH+os.sep+'assets'
 
 ADD_FIX_FUNCTION_CODE_PATH=sys.path[0]+os.sep+'tools'+os.sep+'code'+os.sep+'fixcode'
 
-
 #签名文件
 KEY_STORE_PATH=sys.path[0]+os.sep+"tools"+os.sep+"signkey"+os.sep+"release.keystore"
 

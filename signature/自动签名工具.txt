@@ -1,0 +1,1 @@
+将apk放置到当前目录下，执行python signtool.py即可
