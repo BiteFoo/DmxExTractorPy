@@ -1,0 +1,62 @@
+D:\Android_shell\AndFixNdk
+
+//判断patch文件的签名 函数所在位置
+com.alipay.euler.andfix.AndFixManager.fix(File file, ClassLoader classLoader,List<String> classes)
+//加载特定的补丁
+com.alipay.euler.andfix.patch.PatchManager.loadPatch(Patch patch)
+//修复所有有bug的类方法（全量）
+com.alipay.euler.andfix.AndFixManager.fix(File file, ClassLoader classLoader, List<String> classes)
+//修复单个类
+com.alipay.euler.andfix.AndFixManager.fixClass(Class<?> clazz, ClassLoader classLoader)
+//修复类中的单个方法
+com.alipay.euler.andfix.AndFixManager.replaceMethod(ClassLoader classLoader, String clz, String meth, Method method)
+
+
+差分包工具命令
+使用命令格式：apkpatch -f new.apk -t old.apk -o output1 -k keystore.jks -p 123456 -a 123456 -e 123456
+
+apkpatch -f AndFixNdk.apk -t nAndFixNdk.apk -o output1 -k keystore.jks -p 123456 -a 123456 -e 123456
+
+ 
+
+
+source replaceMethod:src-Method=public int com.euler.test.A_CF.b(java.lang.String,java.lang.String),dest-Method=public int com.euler.test.A_CF.b(java.lang.String,java.lang.String)
+
+pacth entry=com.euler.test.A_CF
+pacth entry=com.euler.test.O_CF
+
+测试加固类抽空准备三个包：
+1.原包（一个条件）=有方法体代码
+2.类方法抽空包（一个条件）=把方法清空并添加native关键字
+3.安装包（两个条件）=把方法修改成native和fixfunc代码的包	static{	AndFixManager.fixfunc(O.class);	}
+
+
+命名：
+1=原包
+2=n=类方法抽空包
+3=nf=安装包
+打差分包2=n=old和3=原=new
+
+
+java调用修复代码
+ static{
+		AndFixManager.fixfunc(O.class);
+	   }
+smali代码
+# direct methods
+.method static constructor <clinit>()V
+    .locals 1
+    .prologue
+    const-class v0, Lcom/euler/test/O;
+    invoke-static {v0}, Lcom/alipay/euler/andfix/AndFixManager;->fixfunc(Ljava/lang/Class;)V
+    return-void
+.end method
+
+ 
+
+
+	
+	
+	
+	
+	
